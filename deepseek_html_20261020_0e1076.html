@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>A–Z Alphabet — Letters Only (British Accent)</title>
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(circle at 30% 15%, #1f2937, #0b1020 70%);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #e5e7eb;
+    min-height: 100vh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 4px 0 2px;
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #38bdf8, #a78bfa, #fb7185, #fbbf24, #38bdf8);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    animation: flow 7s linear infinite;
+    filter: drop-shadow(0 0 10px rgba(56,189,248,.45));
+  }
+  @keyframes flow {
+    from { background-position: 0% 50%; }
+    to   { background-position: 300% 50%; }
+  }
+
+  .subtitle {
+    font-size: 14px; color: #94a3b8; margin-bottom: 14px;
+  }
+
+  .controls {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px; margin-bottom: 20px;
+  }
+  .controls button {
+    font: inherit; font-size: 13px; font-weight: 600;
+    padding: 9px 16px; border-radius: 999px;
+    border: 1px solid #374151; background: #111827;
+    color: #e5e7eb; cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .controls button:hover { background: #1f2937; }
+  .controls button.off { border-color: #7f1d1d; color: #fca5a5; }
+  .controls button.primary {
+    background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+    color: #06121f; border: 0;
+  }
+  .controls button.primary:hover { filter: brightness(1.05); }
+  .controls button:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ========== Grid of letter cards ========== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  @media (min-width: 700px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+  }
+
+  .card {
+    position: relative;
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 18px;
+    padding: 24px 6px;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .15s ease, border-color .15s ease;
+    user-select: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: #38bdf8;
+    box-shadow: 0 10px 24px rgba(56,189,248,.25);
+  }
+  .card:active { transform: translateY(0) scale(.98); }
+
+  .card .upper { font-size: 46px; font-weight: 800; color: #38bdf8; line-height: 1; }
+  .card .lower { font-size: 34px; font-weight: 700; color: #fb7185; line-height: 1; }
+
+  /* ========== Big view modal ========== */
+  .modal {
+    position: fixed; inset: 0;
+    background: rgba(6, 12, 24, .94);
+    backdrop-filter: blur(6px);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+    padding: 20px;
+  }
+  .modal.open { opacity: 1; pointer-events: auto; }
+
+  .modal .close-x {
+    position: absolute; top: 18px; right: 18px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: #111827; border: 1px solid #374151;
+    color: #e5e7eb; font-size: 22px; line-height: 1;
+    cursor: pointer; display: grid; place-items: center;
+    transition: background .15s; z-index: 2;
+  }
+  .modal .close-x:hover { background: #1f2937; }
+
+  .big-content {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 6px;
+    max-width: 900px; width: 100%;
+  }
+  .big-content.animate { animation: popIn .35s cubic-bezier(.34,1.56,.64,1) both; }
+  @keyframes popIn {
+    from { transform: scale(.7); opacity: 0; }
+    to   { transform: scale(1);  opacity: 1; }
+  }
+
+  .big-letter {
+    font-size: clamp(160px, 45vw, 420px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -4px;
+    background: linear-gradient(180deg, #7dd3fc, #38bdf8 40%, #a78bfa 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 32px rgba(56,189,248,.55));
+    display: flex; align-items: baseline;
+    justify-content: center; gap: 20px;
+  }
+  .big-letter .lower {
+    font-size: 0.6em;
+    background: linear-gradient(180deg, #fda4af, #fb7185 40%, #ec4899 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 22px rgba(251,113,133,.55));
+  }
+
+  .speak-hint {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #64748b;
+    letter-spacing: .4px;
+  }
+  .speak-hint.playing { color: #22c55e; }
+
+  /* ========== Next / Prev / Repeat bar ========== */
+  .nav-bar {
+    position: absolute;
+    inset: auto 0 22px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    z-index: 2;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    font: inherit; font-size: 15px; font-weight: 700;
+    padding: 12px 20px;
+    border-radius: 999px;
+    border: 1px solid #374151;
+    background: #111827; color: #e5e7eb;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background .15s, border-color .15s, transform .1s;
+  }
+  .nav-btn:hover { background: #1f2937; border-color: #38bdf8; }
+  .nav-btn:active { transform: scale(.97); }
+  .nav-btn:disabled { opacity: .35; cursor: not-allowed; border-color: #1f2937; }
+  .nav-btn.primary {
+    background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+    color: #06121f; border: 0;
+  }
+  .nav-btn.primary:hover { filter: brightness(1.06); }
+  .nav-btn.repeat {
+    background: linear-gradient(180deg, #86efac, #22c55e);
+    color: #052e16; border: 0;
+  }
+  .nav-btn.repeat:hover { filter: brightness(1.06); }
+
+  .progress {
+    font-size: 13px; color: #64748b; font-weight: 600;
+    min-width: 60px; text-align: center; letter-spacing: .5px;
+  }
+
+  @media (max-width: 480px) {
+    .nav-btn { padding: 10px 14px; font-size: 13px; }
+    .modal .close-x { top: 12px; right: 12px; width: 40px; height: 40px; }
+    .card .upper { font-size: 38px; }
+    .card .lower { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>A–Z Alphabet</h1>
+  <div class="subtitle">Tap a letter — hear it in a British accent</div>
+
+  <div class="controls">
+    <button class="primary" id="playAll">▶ Play all A–Z</button>
+    <button id="repeatBtn" disabled>🔁 Repeat</button>
+    <button id="voiceToggle">🔊 Voice: ON</button>
+    <button id="stopBtn">⏹ Stop</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- ================== BIG VIEW MODAL ================== -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <button class="close-x" id="closeX" aria-label="Close">✕</button>
+
+  <div class="big-content" id="bigContent">
+    <div class="big-letter" id="bigLetter"></div>
+    <div class="speak-hint" id="speakHint">🔊 Tap Repeat to hear it again</div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="nav-btn" id="prevBtn">◀ Prev</button>
+    <button class="nav-btn repeat" id="repeatBigBtn">🔁 Repeat</button>
+    <span class="progress" id="progress">1 / 26</span>
+    <button class="nav-btn primary" id="nextBtn">Next ▶</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ==========================================================
+     Alphabet — letters only, no words, no pictures
+     ========================================================== */
+  const ALPHABET = [
+    "A","B","C","D","E","F","G","H","I","J","K","L","M",
+    "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
+  ];
+
+  /* ==========================================================
+     British voice setup
+     ========================================================== */
+  const speechSupported = "speechSynthesis" in window;
+  let voiceOn = speechSupported;
+  let britishVoice = null;
+  let lastPlayedIndex = -1;
+
+  function pickBritishVoice() {
+    if (!speechSupported) return;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return;
+
+    const candidates = [
+      /Google UK English Female/i,
+      /Google UK English Male/i,
+      /Microsoft (Libby|Sonia|Ryan|Hazel|George)/i,
+      /Daniel/i, /Kate/i, /Serena/i, /Arthur/i
+    ];
+    for (const rx of candidates) {
+      const v = voices.find(x => rx.test(x.name));
+      if (v) { britishVoice = v; return; }
+    }
+    britishVoice =
+      voices.find(v => v.lang && v.lang.toLowerCase() === "en-gb") ||
+      voices.find(v => v.lang && v.lang.toLowerCase().startsWith("en")) ||
+      voices[0];
+  }
+
+  if (speechSupported) {
+    pickBritishVoice();
+    window.speechSynthesis.onvoiceschanged = pickBritishVoice;
+  }
+
+  /* ==========================================================
+     Speak — only the letter, nothing else
+     ========================================================== */
+  function speakLetter(letter) {
+    if (!voiceOn || !speechSupported) return;
+    window.speechSynthesis.cancel();
+
+    const u = new SpeechSynthesisUtterance(letter);
+    if (britishVoice) u.voice = britishVoice;
+    u.lang   = (britishVoice && britishVoice.lang) || "en-GB";
+    u.rate   = 0.85;
+    u.pitch  = 1.05;
+    u.volume = 1;
+
+    const hintEl = document.getElementById("speakHint");
+    u.onstart = () => {
+      hintEl.textContent = "🔊 Speaking…";
+      hintEl.classList.add("playing");
+    };
+    u.onend = () => {
+      hintEl.textContent = "🔊 Tap Repeat to hear it again";
+      hintEl.classList.remove("playing");
+    };
+    window.speechSynthesis.speak(u);
+  }
+
+  /* ==========================================================
+     Voice toggle
+     ========================================================== */
+  const voiceBtn = document.getElementById("voiceToggle");
+  if (!speechSupported) {
+    voiceBtn.textContent = "🔇 Voice not supported";
+    voiceBtn.disabled = true;
+    voiceBtn.classList.add("off");
+  } else {
+    voiceBtn.addEventListener("click", () => {
+      voiceOn = !voiceOn;
+      voiceBtn.textContent = voiceOn ? "🔊 Voice: ON" : "🔇 Voice: OFF";
+      voiceBtn.classList.toggle("off", !voiceOn);
+      if (!voiceOn) window.speechSynthesis.cancel();
+    });
+  }
+
+  /* ==========================================================
+     Build the grid — letter only (upper + lower)
+     ========================================================== */
+  const grid = document.getElementById("grid");
+  const cards = [];
+
+  ALPHABET.forEach((letter, idx) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", `Letter ${letter}`);
+    card.innerHTML =
+      `<span class="upper">${letter}</span>` +
+      `<span class="lower">${letter.toLowerCase()}</span>`;
+
+    card.addEventListener("click", () => openBig(idx));
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openBig(idx);
+      }
+    });
+    grid.appendChild(card);
+    cards.push(card);
+  });
+
+  /* ==========================================================
+     Big view
+     ========================================================== */
+  const modal        = document.getElementById("modal");
+  const bigContent   = document.getElementById("bigContent");
+  const bigLetterEl  = document.getElementById("bigLetter");
+  const progressEl   = document.getElementById("progress");
+  const prevBtn      = document.getElementById("prevBtn");
+  const nextBtn      = document.getElementById("nextBtn");
+  const closeX       = document.getElementById("closeX");
+  const repeatBigBtn = document.getElementById("repeatBigBtn");
+  const repeatBtn    = document.getElementById("repeatBtn");
+  const speakHintEl  = document.getElementById("speakHint");
+
+  let currentIndex = 0;
+
+  function renderBig(speakNow) {
+    const letter = ALPHABET[currentIndex];
+    bigLetterEl.innerHTML =
+      `${letter}<span class="lower">${letter.toLowerCase()}</span>`;
+    progressEl.textContent = `${currentIndex + 1} / ${ALPHABET.length}`;
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === ALPHABET.length - 1;
+
+    bigContent.classList.remove("animate");
+    void bigContent.offsetWidth;
+    bigContent.classList.add("animate");
+
+    if (speakNow) speakLetter(letter);
+  }
+
+  function openBig(idx) {
+    currentIndex = idx;
+    lastPlayedIndex = idx;
+    repeatBtn.disabled = false;
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+    renderBig(true);
+    setTimeout(() => repeatBigBtn.focus(), 120);
+  }
+
+  function closeBig() {
+    modal.classList.remove("open");
+    document.body.style.overflow = "";
+    if (speechSupported) window.speechSynthesis.cancel();
+    speakHintEl.textContent = "🔊 Tap Repeat to hear it again";
+    speakHintEl.classList.remove("playing");
+  }
+
+  function goNext() {
+    if (currentIndex < ALPHABET.length - 1) {
+      currentIndex++;
+      lastPlayedIndex = currentIndex;
+      repeatBtn.disabled = false;
+      renderBig(true);
+    }
+  }
+
+  function goPrev() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      lastPlayedIndex = currentIndex;
+      repeatBtn.disabled = false;
+      renderBig(true);
+    }
+  }
+
+  nextBtn.addEventListener("click", goNext);
+  prevBtn.addEventListener("click", goPrev);
+  closeX.addEventListener("click", closeBig);
+
+  /* Repeat inside the big view */
+  repeatBigBtn.addEventListener("click", () => {
+    speakLetter(ALPHABET[currentIndex]);
+  });
+
+  /* Repeat from the main controls (last played letter) */
+  repeatBtn.addEventListener("click", () => {
+    if (lastPlayedIndex < 0) return;
+    speakLetter(ALPHABET[lastPlayedIndex]);
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeBig();
+  });
+
+  /* Keyboard: ← → Esc R */
+  document.addEventListener("keydown", (e) => {
+    if (!modal.classList.contains("open")) return;
+    if (e.key === "ArrowRight") { e.preventDefault(); goNext(); }
+    if (e.key === "ArrowLeft")  { e.preventDefault(); goPrev(); }
+    if (e.key === "Escape")     { e.preventDefault(); closeBig(); }
+    if (e.key === "r" || e.key === "R") {
+      e.preventDefault();
+      speakLetter(ALPHABET[currentIndex]);
+    }
+  });
+
+  /* Swipe on phone */
+  let touchStartX = 0, touchStartY = 0;
+  modal.addEventListener("touchstart", (e) => {
+    if (!e.touches[0]) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  modal.addEventListener("touchend", (e) => {
+    if (!e.changedTouches[0]) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) < 45 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx > 0) goPrev(); else goNext();
+  }, { passive: true });
+
+  /* ==========================================================
+     Play all A–Z
+     ========================================================== */
+  const playAllBtn = document.getElementById("playAll");
+  let playAllCancelled = false;
+
+  playAllBtn.addEventListener("click", () => {
+    if (!speechSupported || !voiceOn) return;
+    window.speechSynthesis.cancel();
+    playAllCancelled = false;
+    playAllBtn.textContent = "⏸ Playing…";
+
+    let i = 0;
+    function step() {
+      if (playAllCancelled || i >= ALPHABET.length) {
+        playAllBtn.textContent = "▶ Play all A–Z";
+        return;
+      }
+      const letter = ALPHABET[i];
+      const u = new SpeechSynthesisUtterance(letter);
+      if (britishVoice) u.voice = britishVoice;
+      u.lang = (britishVoice && britishVoice.lang) || "en-GB";
+      u.rate = 0.85;
+      u.pitch = 1.05;
+      u.onend = () => {
+        i++;
+        setTimeout(step, 350);
+      };
+      window.speechSynthesis.speak(u);
+    }
+    step();
+  });
+
+  document.getElementById("stopBtn").addEventListener("click", () => {
+    playAllCancelled = true;
+    if (speechSupported) window.speechSynthesis.cancel();
+    playAllBtn.textContent = "▶ Play all A–Z";
+  });
+
+  /* ==========================================================
+     iOS speech unlock
+     ========================================================== */
+  function unlockIOSSpeech() {
+    if (!speechSupported) return;
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0;
+    window.speechSynthesis.speak(u);
+    window.removeEventListener("touchstart", unlockIOSSpeech);
+    window.removeEventListener("click", unlockIOSSpeech);
+  }
+  window.addEventListener("touchstart", unlockIOSSpeech, { once: true });
+  window.addEventListener("click", unlockIOSSpeech, { once: true });
+
+  if (speechSupported) window.speechSynthesis.getVoices();
+})();
+</script>
+</body>
+</html>
